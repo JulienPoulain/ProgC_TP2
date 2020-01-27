@@ -1,44 +1,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 #include "Entite.h"
+
+#define NB_HEROS 3
+#define NB_ENNEMIS 1
+
+void afficherStatut(Entite);
 
 int main() {
 	srand(time(NULL));
 	int tour = 1;
 	int dmg;
-	Entite protagonistes[1];
-	Entite ennemis[1];
+	Entite heros[NB_HEROS];
+	Entite ennemis[NB_HEROS];
 
-	Entite heros;
-	initEntite(&heros, GUERRIER);
+	for (int i=0; i<NB_HEROS; i++) {
+		Entite entite;
+		initEntite(&entite, GUERRIER);
+		heros[i] = entite;
+	}
 
 	Entite boss;
 	initEntite(&boss, SLIME);
-
-	protagonistes[0] = heros;
 	ennemis[0] = boss;
 	
-	while (heros.pv > 0 && boss.pv > 0) {
+	while (heros[0].pv > 0 && boss.pv > 0) {
+
 		printf("Tour %d\n", tour);
-		// État du héros
-		printf("HEROS: %d/100 %d/%d",  heros.pv,  heros.pm,  heros.pmMax);
-		if ( heros.statutPoison)
-			printf(" POISON");
 		printf("\n");
-		// État du boss
-		printf("BOSS : %d/100", boss.pv);
-		if (boss.statutPoison)
-			printf(" POISON");
+
+		// État des héros
+		for (int i=0; i<NB_HEROS; i++) {
+			printf("%d ", i);
+			afficherStatut(heros[i]);
+		}
 		printf("\n");
+
+		// État des ennemis
+		for (int i=0; i<NB_ENNEMIS; i++) {
+			printf("%d ", i);
+			afficherStatut(ennemis[i]);
+		}
 		printf("\n");
 		
 		// Choix du joueur
-		printf("1 Attaquer | 2 Defendre | 3 Poison (%dPM) | 4 Antidote\n", heros.coutPoison);
+		printf("1 Attaquer | 2 Defendre | 3 Poison (%dPM) | 4 Antidote\n", heros[0].coutPoison);
 		do {
 			printf("> ");
-			scanf("%d", & heros.action);
-		} while ( heros.action != 1 &&  heros.action != 2 &&  heros.action != 3 &&  heros.action != 4);
+			scanf("%d", & heros[0].action);
+		} while ( heros[0].action != 1 &&  heros[0].action != 2 &&  heros[0].action != 3 &&  heros[0].action != 4);
 		printf("\n");
 		
 		// Choix du boss
@@ -46,37 +58,37 @@ int main() {
 		
 		// Action du joueur
 		// 1 ATTAQUER
-		if ( heros.action == 1) {
+		if ( heros[0].action == 1) {
 			if (boss.action == 2) {
 				printf("Vous attaquez le BOSS, mais celui-ci se defend.\n");
-				dmg =  heros.dmgAtk/4;
+				dmg =  heros[0].dmgAtk/4;
 			} else {
 				printf("Vous attaquez le BOSS.\n");
-				dmg =  heros.dmgAtk;
+				dmg =  heros[0].dmgAtk;
 			}
 			printf("> %d DMG\n", dmg);
 			printf("> PV BOSS : %d => ", boss.pv);
 			boss.pv -= dmg;
 			printf("%d\n", boss.pv);
 		// 2 DEFENDRE
-		} else if ( heros.action == 2) {
+		} else if ( heros[0].action == 2) {
 			printf("Vous vous preparez a defendre.\n");
 		// 3 LANCER POISON
-		} else if ( heros.action == 3) {
+		} else if ( heros[0].action == 3) {
 			printf("Vous lancez un sort de poison sur le BOSS.\n");
-			if ( heros.pm >=  heros.coutPoison) {
+			if ( heros[0].pm >=  heros[0].coutPoison) {
 				printf("Le BOSS est empoisonne.\n");
-				 heros.pm -=  heros.coutPoison;
+				 heros[0].pm -=  heros[0].coutPoison;
 				boss.statutPoison = 1;
 			} else {
 				printf("Vous n'avez pas assez de magie, le sort echoue.\n");
 			}
 		// BOIRE ANTIDOTE
-		} else if ( heros.action == 4) {
+		} else if ( heros[0].action == 4) {
 			printf("Vous buvez un antidote.\n");
-			if ( heros.statutPoison == 1) {
+			if ( heros[0].statutPoison == 1) {
 				printf("Vous etes gueri du poison.\n");
-				 heros.statutPoison = 0;
+				 heros[0].statutPoison = 0;
 			}
 		}
 		printf("\n");
@@ -85,7 +97,7 @@ int main() {
 		if (boss.pv > 0) {
 			// ATTAQUE
 			if (boss.action == 1 || (boss.action == 3 && boss.pm < boss.coutPoison)) {
-				if ( heros.action == 2) {
+				if ( heros[0].action == 2) {
 					printf("Le BOSS frappe dans votre garde.\n");
 					dmg = boss.dmgAtk/4;
 				} else {
@@ -93,9 +105,9 @@ int main() {
 					dmg = boss.dmgAtk;
 				}
 				printf("> %d DMG\n", dmg);
-				printf("> PV HEROS : %d => ",  heros.pv);
-				 heros.pv -= dmg;
-				printf("%d\n",  heros.pv);
+				printf("> PV HEROS : %d => ",  heros[0].pv);
+				 heros[0].pv -= dmg;
+				printf("%d\n",  heros[0].pv);
 			// DEFENSE
 			} else if (boss.action == 2) {
 				printf("Le BOSS vous regarde intensement.\n");
@@ -104,19 +116,19 @@ int main() {
 				printf("Le BOSS repand un gaz toxique.\n");
 				printf("Vous etes empoisonne.\n");
 				boss.pm -= boss.coutPoison;
-				 heros.statutPoison = 1;
+				 heros[0].statutPoison = 1;
 			}
 			printf("\n");
 		}
 		
 		// Alération d'état du joueur
-		if ( heros.pv > 0) {
-			if ( heros.statutPoison) {
+		if ( heros[0].pv > 0) {
+			if ( heros[0].statutPoison) {
 				printf("Le poison vous affaibli.\n");
 				printf("> %d DMG\n", boss.dmgPoison);
-				printf("> PV HEROS : %d => ",  heros.pv);
-				 heros.pv -= boss.dmgPoison;
-				printf("%d\n",  heros.pv);
+				printf("> PV HEROS : %d => ",  heros[0].pv);
+				 heros[0].pv -= boss.dmgPoison;
+				printf("%d\n",  heros[0].pv);
 				printf("\n");
 			}
 		}
@@ -125,18 +137,18 @@ int main() {
 		if (boss.pv > 0) {
 			if (boss.statutPoison) {
 				printf("Le poison epuise le BOSS.\n");
-				printf("> %d DMG\n",  heros.dmgPoison);
+				printf("> %d DMG\n",  heros[0].dmgPoison);
 				printf("> PV BOSS : %d => ", boss.pv);
-				boss.pv -=  heros.dmgPoison;
+				boss.pv -=  heros[0].dmgPoison;
 				printf("%d\n", boss.pv);
 				printf("\n");
 			}
 		}
 		
 		// Résolution du tour
-		 heros.pm += 1;
-		if ( heros.pm >  heros.pmMax) {
-			 heros.pm =  heros.pmMax;
+		 heros[0].pm += 1;
+		if ( heros[0].pm >  heros[0].pmMax) {
+			 heros[0].pm =  heros[0].pmMax;
 		}
 		boss.pm += 1;
 		if (boss.pm > boss.pmMax) {
@@ -146,11 +158,18 @@ int main() {
 		printf("================================\n\n");
 	}
 	
-	if ( heros.pv <= 0) {
+	if ( heros[0].pv <= 0) {
 		printf("VOUS AVEZ PERDU\n");
 	} else {
 		printf("VICTOIRE !\n");
 	}
 	
 	return 0;
+}
+
+void afficherStatut(Entite entite) {
+	printf("%s: %d/100 PV | %d/%d PM", getCategorieName(entite.categorie), entite.pv, entite.pm, entite.pmMax);
+	if ( entite.statutPoison)
+		printf(" | POISON");
+	printf("\n");
 }

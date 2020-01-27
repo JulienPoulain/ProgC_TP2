@@ -13,6 +13,8 @@ enum Categorie {
 	SLIME
 };
 
+const char* getCategorieName(Categorie);
+
 typedef struct Entite Entite;
 struct Entite {
 	Categorie categorie;
