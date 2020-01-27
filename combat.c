@@ -1,54 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-struct Entite {
-	int pv;
-	int pm;
-	int pmMax;
-	int pmRegen;
-	int statutPoison;
-	int dmgAtk;
-	int dmgPoison;
-	int coutPoison;
-	int action;
-};
-
-typedef struct Entite Entite;
+#include "Entite.h"
 
 int main() {
 	srand(time(NULL));
 	int tour = 1;
-	
-	// Caractéristiques du héros
-	
-	Entite heros;
-	heros.pv = 100;
-	heros.pm = 10;
-	heros.pmMax = 10;
-	heros.pmRegen = 1;
-	heros.statutPoison = 0;
-	heros.dmgAtk = 10;
-	heros.dmgPoison = 4;
-	heros.coutPoison = 8;
-	heros.action = 0;
-	
-	// Caractéristiques du boss
-	
-	Entite boss;
-	boss.pv = 100;
-	boss.pm = 10;
-	boss.pmMax = 10;
-	boss.pmRegen = 1;
-	boss.statutPoison = 0;
-	boss.dmgAtk = 15;
-	boss.dmgPoison = 2;
-	boss.coutPoison = 6;
-	boss.action = 0;
-	
 	int dmg;
+	Entite protagonistes[1];
+	Entite ennemis[1];
+
+	Entite heros;
+	initEntite(&heros, GUERRIER);
+
+	Entite boss;
+	initEntite(&boss, SLIME);
+
+	protagonistes[0] = heros;
+	ennemis[0] = boss;
 	
-	while ( heros.pv > 0 && boss.pv > 0) {
+	while (heros.pv > 0 && boss.pv > 0) {
 		printf("Tour %d\n", tour);
 		// État du héros
 		printf("HEROS: %d/100 %d/%d",  heros.pv,  heros.pm,  heros.pmMax);
@@ -63,7 +34,7 @@ int main() {
 		printf("\n");
 		
 		// Choix du joueur
-		printf("1 Attaquer | 2 Defendre | 3 Poison (%dPM) | 4 Antidote\n",  heros.coutPoison);
+		printf("1 Attaquer | 2 Defendre | 3 Poison (%dPM) | 4 Antidote\n", heros.coutPoison);
 		do {
 			printf("> ");
 			scanf("%d", & heros.action);
@@ -105,7 +76,7 @@ int main() {
 			printf("Vous buvez un antidote.\n");
 			if ( heros.statutPoison == 1) {
 				printf("Vous etes gueri du poison.\n");
-				 heros.statutPoison == 0;
+				 heros.statutPoison = 0;
 			}
 		}
 		printf("\n");
